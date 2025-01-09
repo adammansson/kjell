@@ -4,6 +4,8 @@
 #include <string.h>
 #include <unistd.h>
 
+#include "kjell.h"
+
 #define KJELL_SCAN_SIZE (64)
 char *kjell_scan()
 {
@@ -36,90 +38,50 @@ char *kjell_scan()
 	return buffer;
 }
 
-#define KJELL_PARSE_SIZE (4)
-#define KJELL_PARSE_DELIM (" \t")
-char **kjell_parse(char *line)
+void print_tokens(token_t *token)
 {
-	int bufsize;
-	char **buffer;
-	int pos;
-	char *token;
+	char *c;
 
-	bufsize = KJELL_PARSE_SIZE;
-	buffer = malloc(bufsize * sizeof(char *));
+	printf("\nALL TOKENS FOUND:\n");
+	while (true) {
+		printf("token type = %d\n", token->type);
 
-	pos = 0;
-	token = strtok(line, KJELL_PARSE_DELIM);
-	while (token != NULL) {
-		buffer[pos] = token;
-		pos++;
-
-		if (pos >= bufsize) {
-			bufsize += KJELL_PARSE_SIZE;
-			buffer = realloc(buffer, bufsize * sizeof(char *));
+		if (token->type == TOKEN_END) {
+			putchar('\n');
+			return;
 		}
-		
-		token = strtok(NULL, KJELL_PARSE_DELIM);
-	}
 
-	buffer[pos] = NULL;
-
-	return buffer;
-}
-
-int kjell_launch(char **args)
-{
-	int cid;
-
-	cid = fork();
-
-	if (cid == 0) {
-		if (execvp(*args, args) == -1)
-			perror("kjell");
-
-		exit(EXIT_FAILURE);
-	} else
-		wait(NULL);
-
-	return 0;
-}
-
-int kjell_execute(char **args)
-{
-	if (args[0] == NULL)
-		return 1;
-
-	if (strcmp(args[0], "exit") == 0)
-		return 1;
-
-	if (strcmp(args[0], "cd") == 0) {
-		if (args[1] == NULL) {
-			if (chdir("/home/adam") == -1)
-				perror("kjell");
-		} else {
-			if (chdir(args[1]) == -1)
-				perror("kjell");
+		c = token->start;
+		putchar('\'');
+		while (c <= token->end) {
+			putchar(*c);
+			c++;
 		}
-		return 0;
-	}
+		printf("'\n");
 
-	return kjell_launch(args);
+		token++;
+	}
 }
 
 void kjell_loop()
 {
 	char *line;
-	char **args;
-	int status;
+	token_t *tokens;
 
-	status = 0;
-	while (!status) {
+	/*
+	line = "echo \"quoted mump\" pog | ls";
+	tokens = kjell_tokenize(line);
+	print_tokens(tokens);
+	*/
+
+	while (true) {
 		line = kjell_scan();
-		args = kjell_parse(line);
-		status = kjell_execute(args);
+		printf("'%s'\n", line);
+		tokens = kjell_tokenize(line);
+		print_tokens(tokens);
 
 		free(line);
-		free(args);
+		free(tokens);
 	}
 }
 
