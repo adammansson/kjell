@@ -104,5 +104,7 @@ token_t *kjell_tokenize(char *input)
 			offset++;
 			continue;
 		}
+
+		assert(false);
 	}
 }

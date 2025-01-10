@@ -12,3 +12,5 @@ typedef struct token {
 } token_t;
 
 token_t *kjell_tokenize(char *input);
+
+int kjell_execute(token_t *tokens);
