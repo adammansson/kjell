@@ -68,12 +68,11 @@ void kjell_loop()
 	char *line;
 	token_t *tokens;
 
-	/*
-	line = "echo \"quoted mump\" pog | ls";
+	line = "echo \"quoted mump\" pog | ls ./src/";
 	tokens = kjell_tokenize(line);
 	print_tokens(tokens);
-	*/
 
+	/*
 	while (true) {
 		line = kjell_scan();
 		printf("'%s'\n", line);
@@ -83,6 +82,7 @@ void kjell_loop()
 		free(line);
 		free(tokens);
 	}
+	*/
 }
 
 int main(void)
